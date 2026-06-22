@@ -158,8 +158,9 @@ All settings live in `config.py`. The most useful ones are:
 | `MAX_REQUESTS_PER_MINUTE` | `185` | Rate limit (adjust for your OpenRouter plan) |
 | `MAX_CONCURRENT_LLM_REQUESTS` | `20` | Parallel LLM workers |
 | `SIMILARITY_THRESHOLD_PERCENTILE` | `85` | Chunking sensitivity (range 60-95; higher = smaller chunks) |
-| `FLASHCARDS_MIN_PER_CHUNK` | `2` | Minimum flashcards generated per chunk |
-| `FLASHCARDS_MAX_PER_CHUNK` | `5` | Maximum flashcards generated per chunk |
+| `FLASHCARD_STYLE` | `"atomic"` | Generation style: `"atomic"` or `"comprehensive"` |
+| `CHARS_PER_FLASHCARD_ATOMIC` | `600` | Target character density for atomic cards |
+| `CHARS_PER_FLASHCARD_COMPREHENSIVE` | `1200` | Target character density for comprehensive cards |
 | `ANKI_DECK_NAME` | `Lecture Notes` | Name of the top-level Anki deck |
 
 ---

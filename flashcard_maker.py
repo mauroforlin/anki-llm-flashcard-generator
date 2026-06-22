@@ -13,6 +13,7 @@ from typing import Dict, List, Tuple
 import httpx
 
 import config
+from pdf_reader import _get_embeddings_batch, _cosine_similarity, _load_embedding_cache, _save_embedding_cache
 
 logger = logging.getLogger(__name__)
 
@@ -76,18 +77,17 @@ SYSTEM_PROMPT = (
 )
 
 
-def _build_user_prompt(chunk_text: str, pdf_name: str) -> str:
-    return f"""Analyze the following text extracted from the lecture \"{pdf_name}\" and \
-create between {config.FLASHCARDS_MIN_PER_CHUNK} and {config.FLASHCARDS_MAX_PER_CHUNK} \
-Anki flashcards.
+def _build_user_prompt(chunk_text: str, pdf_name: str, target_count: int) -> str:
+    if config.FLASHCARD_STYLE == "atomic":
+        rules = """1. STRICTLY EDUCATIONAL CONTENT: You MUST ONLY create flashcards about the actual academic subject matter. ABSOLUTELY NO questions about meta-data (e.g., "What is the name of the professor?", "What is the date?", "What is the name of the course?", syllabus details, etc.).
 
-Write all flashcard content in the SAME LANGUAGE as the source text below.
+2. ATOMIC PRINCIPLE: Each flashcard MUST test exactly ONE key concept. Keep questions laser-focused and binary ("I know it / I don't").
 
-=============================================================
-RULES FOR HIGH-QUALITY FLASHCARDS:
-=============================================================
+3. QUESTION QUALITY: Be clear, specific, and unambiguous. Only use information explicitly stated in the text.
 
-1. STRICTLY EDUCATIONAL CONTENT: You MUST ONLY create flashcards about the actual academic subject matter. ABSOLUTELY NO questions about meta-data (e.g., "What is the name of the professor?", "What is the date?", "What is the name of the course?", syllabus details, etc.).
+4. ANSWER QUALITY: Keep answers extremely concise (1-2 sentences max). Use a short bullet list only if enumerating. Always include numerical values and units when relevant."""
+    else:
+        rules = """1. STRICTLY EDUCATIONAL CONTENT: You MUST ONLY create flashcards about the actual academic subject matter. ABSOLUTELY NO questions about meta-data (e.g., "What is the name of the professor?", "What is the date?", "What is the name of the course?", syllabus details, etc.).
 
 2. BROADER CONCEPTS: Create comprehensive questions that cover major topics, mechanisms, or relationships rather than extremely granular or atomic details. The user prefers fewer but wider questions.
 
@@ -100,7 +100,18 @@ RULES FOR HIGH-QUALITY FLASHCARDS:
    - Answers should be detailed, comprehensive paragraphs or bulleted lists explaining the concept fully.
    - Avoid single-word answers. Provide a thorough explanation.
    - Always include numerical values, units, and clinical thresholds when relevant.
-   - Summarize clearly -- do not copy entire paragraphs verbatim.
+   - Summarize clearly -- do not copy entire paragraphs verbatim."""
+
+    return f"""Analyze the following text extracted from the lecture \"{pdf_name}\" and \
+create approximately {target_count} Anki flashcards.
+
+Write all flashcard content in the SAME LANGUAGE as the source text below.
+
+=============================================================
+RULES FOR HIGH-QUALITY FLASHCARDS:
+=============================================================
+
+{rules}
 
 =============================================================
 RESPONSE FORMAT (pure JSON array, no extra text before or after):
@@ -202,6 +213,10 @@ async def _generate_flashcards_for_chunk(
             # Wait for permission from the rate limiter before sending
             await _rate_limiter.acquire()
 
+            # Calculate target number of flashcards based on chunk length and selected style density
+            density = config.CHARS_PER_FLASHCARD_ATOMIC if config.FLASHCARD_STYLE == "atomic" else config.CHARS_PER_FLASHCARD_COMPREHENSIVE
+            target_count = max(1, len(chunk_text) // density)
+
             async with semaphore:
                 response = await client.post(
                     f"{config.OPENROUTER_BASE_URL}/chat/completions",
@@ -215,7 +230,7 @@ async def _generate_flashcards_for_chunk(
                         "model": config.CHAT_MODEL,
                         "messages": [
                             {"role": "system", "content": SYSTEM_PROMPT},
-                            {"role": "user", "content": _build_user_prompt(chunk_text, pdf_name)},
+                            {"role": "user", "content": _build_user_prompt(chunk_text, pdf_name, target_count)},
                         ],
                         "temperature": config.LLM_TEMPERATURE,
                         "max_tokens": config.LLM_MAX_TOKENS,
@@ -333,10 +348,78 @@ async def generate_all_flashcards(
         elif result:
             results[pdf_name].extend(result)
 
-    # Final summary
+    # Final summary before deduplication
     total_flashcards = sum(len(cards) for cards in results.values())
     logger.info(f"\n[DONE] Generation complete: {total_flashcards} total flashcards")
+
+    # Deduplicate
+    results = await deduplicate_flashcards(results)
+
     for pdf_name, cards in results.items():
         logger.info(f"  * {pdf_name}: {len(cards)} flashcards")
 
     return results
+
+# ---------------------------------------------------------------------------
+# Semantic deduplication
+# ---------------------------------------------------------------------------
+
+async def deduplicate_flashcards(flashcards_by_pdf: Dict[str, List[Dict[str, str]]]) -> Dict[str, List[Dict[str, str]]]:
+    """
+    Remove redundant flashcards per-PDF using semantic similarity of the questions.
+    Uses a greedy keep-first approach.
+    """
+    logger.info("\n[START] Deduplicating flashcards (per-PDF)...")
+    cache = _load_embedding_cache()
+    semaphore = asyncio.Semaphore(config.MAX_CONCURRENT_EMBEDDING_REQUESTS)
+    
+    total_dropped = 0
+    
+    async with httpx.AsyncClient() as client:
+        for pdf_name, cards in flashcards_by_pdf.items():
+            if not cards:
+                continue
+                
+            questions = [card["question"] for card in cards]
+            
+            try:
+                embeddings = await _get_embeddings_batch(questions, client, cache, semaphore)
+            except Exception as e:
+                logger.error(f"  [X] Deduplication failed for '{pdf_name}' due to embedding error: {e}")
+                continue
+                
+            if not all(e is not None for e in embeddings):
+                logger.warning(f"  [!] Missing embeddings for '{pdf_name}'. Skipping deduplication.")
+                continue
+                
+            accepted_cards = []
+            accepted_embeddings = []
+            dropped_count = 0
+            
+            for i, card in enumerate(cards):
+                emb = embeddings[i]
+                is_duplicate = False
+                for accepted_emb in accepted_embeddings:
+                    sim = _cosine_similarity(emb, accepted_emb)
+                    if sim > 0.88:
+                        is_duplicate = True
+                        break
+                        
+                if is_duplicate:
+                    dropped_count += 1
+                else:
+                    accepted_cards.append(card)
+                    accepted_embeddings.append(emb)
+                    
+            if dropped_count > 0:
+                logger.info(f"  * {pdf_name}: dropped {dropped_count} duplicate(s)")
+                total_dropped += dropped_count
+            flashcards_by_pdf[pdf_name] = accepted_cards
+            
+    _save_embedding_cache(cache)
+    if total_dropped > 0:
+        logger.info(f"[DONE] Dropped {total_dropped} redundant flashcard(s) in total.")
+    else:
+        logger.info("[DONE] No duplicates found.")
+        
+    return flashcards_by_pdf

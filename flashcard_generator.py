@@ -118,7 +118,7 @@ def print_banner():
     print(f"  Embedding model : {config.EMBEDDING_MODEL}")
     print(f"  Rate limit      : {config.MAX_REQUESTS_PER_MINUTE} req/min")
     print(f"  LLM workers     : {config.MAX_CONCURRENT_LLM_REQUESTS}")
-    print(f"  Cards per chunk : {config.FLASHCARDS_MIN_PER_CHUNK}-{config.FLASHCARDS_MAX_PER_CHUNK}")
+    print(f"  Flashcard style : {config.FLASHCARD_STYLE} (dynamic density)")
     print("=" * 60 + "\n")
 
 

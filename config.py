@@ -74,9 +74,12 @@ EMBEDDING_BATCH_SIZE = 50
 # Flashcard Generation
 # -----------------------------------------------------------------------------
 
-# Target range of flashcards to generate per chunk
-FLASHCARDS_MIN_PER_CHUNK = 2
-FLASHCARDS_MAX_PER_CHUNK = 5
+# Generation style. Options: "atomic" (strict SRS, short answers) or "comprehensive" (broad paragraphs)
+FLASHCARD_STYLE = "atomic"
+
+# Target character density per flashcard. Used to calculate the dynamic quota per chunk.
+CHARS_PER_FLASHCARD_ATOMIC = 600
+CHARS_PER_FLASHCARD_COMPREHENSIVE = 1200
 
 # Model temperature: lower values produce more structured, deterministic output
 LLM_TEMPERATURE = 0.3
