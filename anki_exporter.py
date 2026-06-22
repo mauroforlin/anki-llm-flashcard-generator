@@ -22,136 +22,29 @@ logger = logging.getLogger(__name__)
 # ---------------------------------------------------------------------------
 
 CARD_FRONT_TEMPLATE = """
-<div class="card front">
-  <div class="question-label">Question</div>
-  <div class="question">{{Question}}</div>
-  <div class="topic-badge">{{Topic}}</div>
+<div style="text-align: center; font-size: 24px; margin-bottom: 20px;">
+  {{Question}}
+</div>
+<div style="text-align: center; font-size: 12px; color: #888;">
+  [{{Topic}}]
 </div>
 """
 
 CARD_BACK_TEMPLATE = """
 {{FrontSide}}
-<hr class="divider">
-<div class="card back">
-  <div class="answer-label">Answer</div>
-  <div class="answer">{{Answer}}</div>
+<hr id=answer>
+<div style="text-align: left; font-size: 20px; padding: 10px;">
+  {{Answer}}
 </div>
 """
 
 CARD_CSS = """
-/* =====================================================
-   Anki Flashcard Stylesheet
-   ===================================================== */
-
 .card {
-  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
-  font-size: 16px;
-  line-height: 1.6;
-  color: #1a1a2e;
-  background: #f0f4ff;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-.front, .back {
-  max-width: 680px;
-  width: 100%;
-  padding: 32px 36px;
-  border-radius: 16px;
-  box-shadow: 0 4px 24px rgba(67, 97, 238, 0.12);
-  background: #ffffff;
-}
-
-.question-label, .answer-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  margin-bottom: 12px;
-}
-
-.question-label {
-  color: #4361ee;
-}
-
-.answer-label {
-  color: #2ec4b6;
-}
-
-.question {
-  font-size: 19px;
-  font-weight: 600;
-  color: #1a1a2e;
-  line-height: 1.5;
-  margin-bottom: 16px;
-}
-
-.answer {
-  font-size: 16px;
-  color: #333366;
-  line-height: 1.7;
-}
-
-.topic-badge {
-  display: inline-block;
-  margin-top: 18px;
-  padding: 4px 12px;
-  background: #eef1ff;
-  color: #4361ee;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-}
-
-.divider {
-  border: none;
-  border-top: 2px solid #e8eeff;
-  margin: 24px 0;
-}
-
-/* Lists inside answers */
-.answer ul, .answer ol {
-  padding-left: 20px;
-  margin: 8px 0;
-}
-
-.answer li {
-  margin-bottom: 6px;
-}
-
-/* Anki night mode */
-.night_mode .card {
-  background: #1a1a2e;
-  color: #e8eeff;
-}
-
-.night_mode .front,
-.night_mode .back {
-  background: #16213e;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
-}
-
-.night_mode .question {
-  color: #e8eeff;
-}
-
-.night_mode .answer {
-  color: #b8c0ff;
-}
-
-.night_mode .topic-badge {
-  background: #0f3460;
-  color: #a5b4fc;
-}
-
-.night_mode .divider {
-  border-top-color: #1f2d5a;
+  font-family: arial;
+  font-size: 20px;
+  text-align: center;
+  color: black;
+  background-color: white;
 }
 """
 

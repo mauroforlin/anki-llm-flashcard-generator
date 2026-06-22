@@ -75,8 +75,8 @@ EMBEDDING_BATCH_SIZE = 50
 # -----------------------------------------------------------------------------
 
 # Target range of flashcards to generate per chunk
-FLASHCARDS_MIN_PER_CHUNK = 5
-FLASHCARDS_MAX_PER_CHUNK = 12
+FLASHCARDS_MIN_PER_CHUNK = 2
+FLASHCARDS_MAX_PER_CHUNK = 5
 
 # Model temperature: lower values produce more structured, deterministic output
 LLM_TEMPERATURE = 0.3

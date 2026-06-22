@@ -90,33 +90,20 @@ Write all flashcard content in the SAME LANGUAGE as the source text below.
 RULES FOR HIGH-QUALITY FLASHCARDS:
 =============================================================
 
-1. ATOMIC PRINCIPLE: each flashcard tests exactly ONE key concept. Do not combine
-   multiple distinct ideas into a single question.
+1. STRICTLY EDUCATIONAL CONTENT: You MUST ONLY create flashcards about the actual academic subject matter. ABSOLUTELY NO questions about meta-data (e.g., "What is the name of the professor?", "What is the date?", "What is the name of the course?", syllabus details, etc.).
 
-2. QUESTION TYPES to use (vary the type across cards):
-   - Definition: "What is [term]?" / "How is [concept] defined?"
-   - Mechanism: "What is the mechanism of [physiological/pathological process]?"
-   - Classification: "How are [entities] classified?" / "What are the types of [X]?"
-   - Numerical values: "What is the normal/threshold value of [parameter]?" -- always
-     include the unit of measurement in the answer.
-   - Pathogenesis: "What is the pathogenesis of [disease]?"
-   - Differential diagnosis: "How does [X] differ from [Y]?"
-   - Cause and effect: "What causes [event]?" / "What are the consequences of [X]?"
-   - Treatment: "How is [condition] treated?" / "What is the therapy for [X]?"
+2. BROADER CONCEPTS: Create comprehensive questions that cover major topics, mechanisms, or relationships rather than extremely granular or atomic details. The user prefers fewer but wider questions.
 
 3. QUESTION QUALITY:
-   - Be specific and unambiguous: each question must have exactly one correct answer.
-   - Avoid trivial questions with obvious answers.
+   - Be clear and unambiguous.
+   - Do not ask trivial questions.
    - Only use information that is explicitly stated in the provided text.
 
 4. ANSWER QUALITY:
-   - Keep answers concise but complete: 1 to 4 sentences at most.
-   - Use a bullet list (with dashes) only when there are 3 or more items to enumerate.
+   - Answers should be detailed, comprehensive paragraphs or bulleted lists explaining the concept fully.
+   - Avoid single-word answers. Provide a thorough explanation.
    - Always include numerical values, units, and clinical thresholds when relevant.
    - Summarize clearly -- do not copy entire paragraphs verbatim.
-
-5. EXCLUSIONS: do not create flashcards based on introductory context, purely
-   illustrative examples, or incomplete/very short sentences in the text.
 
 =============================================================
 RESPONSE FORMAT (pure JSON array, no extra text before or after):
