@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Dict, List
 
 import genanki
+import html
 
 import config
 
@@ -239,6 +240,10 @@ def export_to_apkg(
 
             if not question or not answer:
                 continue
+
+            # Escape HTML characters to avoid Anki errors for '<' or '>'
+            question = html.escape(question)
+            answer = html.escape(answer)
 
             # Convert newlines to HTML line breaks for Anki rendering
             answer_html = answer.replace("\n- ", "\n* ").replace("\n", "<br>")

@@ -143,6 +143,10 @@ def _parse_flashcards_response(raw_response: str) -> List[Dict[str, str]]:
     Extract and validate flashcards from a raw LLM response string.
     Handles slightly malformed JSON via multiple fallback strategies.
     """
+    if not raw_response:
+        logger.warning("LLM response was empty or None")
+        return []
+
     # Strip markdown code fences if present (e.g., ```json ... ```)
     clean = re.sub(r"```(?:json)?\s*", "", raw_response, flags=re.DOTALL)
     clean = re.sub(r"```\s*$", "", clean, flags=re.MULTILINE).strip()
