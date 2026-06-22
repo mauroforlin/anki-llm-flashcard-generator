@@ -253,6 +253,8 @@ async def _generate_flashcards_for_chunk(
                     f"  [!] Chunk {chunk_index+1}/{total_chunks} of '{pdf_name}': "
                     f"empty or unparseable response (attempt {attempt+1})"
                 )
+                if attempt < config.MAX_RETRIES - 1:
+                    await asyncio.sleep(2 ** attempt)
 
         except httpx.HTTPStatusError as e:
             if e.response.status_code == 429:
@@ -265,6 +267,8 @@ async def _generate_flashcards_for_chunk(
                     f"of '{pdf_name}': {e}"
                 )
                 if attempt == config.MAX_RETRIES - 1:
+                    if progress_callback:
+                        progress_callback()
                     return []
         except Exception as e:
             logger.error(
@@ -274,8 +278,12 @@ async def _generate_flashcards_for_chunk(
             if attempt < config.MAX_RETRIES - 1:
                 await asyncio.sleep(2 ** attempt)
             else:
+                if progress_callback:
+                    progress_callback()
                 return []
 
+    if progress_callback:
+        progress_callback()
     return []
 
 
