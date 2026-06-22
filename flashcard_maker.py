@@ -210,14 +210,14 @@ async def _generate_flashcards_for_chunk(
     """
     for attempt in range(config.MAX_RETRIES):
         try:
-            # Wait for permission from the rate limiter before sending
-            await _rate_limiter.acquire()
-
             # Calculate target number of flashcards based on chunk length and selected style density
             density = config.CHARS_PER_FLASHCARD_ATOMIC if config.FLASHCARD_STYLE == "atomic" else config.CHARS_PER_FLASHCARD_COMPREHENSIVE
             target_count = max(1, len(chunk_text) // density)
 
             async with semaphore:
+                # Wait for permission from the rate limiter before sending
+                await _rate_limiter.acquire()
+
                 response = await client.post(
                     f"{config.OPENROUTER_BASE_URL}/chat/completions",
                     headers={
