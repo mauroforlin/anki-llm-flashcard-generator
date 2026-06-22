@@ -1,0 +1,28 @@
+# =============================================================================
+# requirements.txt -- Anki Flashcard Generator v2.0
+# =============================================================================
+
+# Environment variable loading (.env file support)
+python-dotenv>=1.0.0
+
+# PDF extraction (best quality for LLM pipelines)
+pymupdf4llm>=0.0.17
+pdfplumber>=0.11.0          # fallback for complex PDF layouts
+
+# NLP / sentence tokenization
+nltk>=3.8.1
+
+# Numerics (cosine similarity for semantic chunking)
+numpy>=1.26.0
+
+# Async HTTP client (parallel API calls)
+httpx>=0.27.0
+
+# Anki deck generation
+genanki>=0.13.0
+
+# Progress bar
+tqdm>=4.66.0
+
+# OpenAI-compatible client (pointed at OpenRouter)
+openai>=1.30.0
