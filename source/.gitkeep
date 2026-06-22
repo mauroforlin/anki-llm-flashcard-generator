@@ -1,0 +1,3 @@
+# This file exists only to make Git track this otherwise empty folder.
+# Place your PDF source files here before running flashcard_generator.py.
+# The contents of this folder are ignored by Git (see .gitignore).

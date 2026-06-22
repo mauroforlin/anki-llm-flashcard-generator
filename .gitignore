@@ -14,8 +14,11 @@ env/
 .env
 # .env.example is intentionally NOT ignored (it is the safe template)
 
-# Generated output -- users keep their own .apkg files locally
-output/
+# Local data folders -- ignore contents but track .gitkeep scaffold
+output/*
+!output/.gitkeep
+source/*
+!source/.gitkeep
 
 # Embedding cache -- computed locally, no need to share
 .embedding_cache.pkl
