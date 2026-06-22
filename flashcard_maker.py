@@ -353,7 +353,10 @@ async def generate_all_flashcards(
     logger.info(f"\n[DONE] Generation complete: {total_flashcards} total flashcards")
 
     # Deduplicate
-    results = await deduplicate_flashcards(results)
+    if getattr(config, "ENABLE_DEDUPLICATION", False):
+        results = await deduplicate_flashcards(results)
+    else:
+        logger.info("\n[SKIP] Deduplication is disabled in config.py.")
 
     for pdf_name, cards in results.items():
         logger.info(f"  * {pdf_name}: {len(cards)} flashcards")
@@ -401,7 +404,7 @@ async def deduplicate_flashcards(flashcards_by_pdf: Dict[str, List[Dict[str, str
                 is_duplicate = False
                 for accepted_emb in accepted_embeddings:
                     sim = _cosine_similarity(emb, accepted_emb)
-                    if sim > 0.88:
+                    if sim > getattr(config, "DEDUPLICATION_THRESHOLD", 0.95):
                         is_duplicate = True
                         break
                         

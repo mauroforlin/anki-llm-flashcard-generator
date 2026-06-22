@@ -161,7 +161,14 @@ All settings live in `config.py`. The most useful ones are:
 | `FLASHCARD_STYLE` | `"atomic"` | Generation style: `"atomic"` or `"comprehensive"` |
 | `CHARS_PER_FLASHCARD_ATOMIC` | `600` | Target character density for atomic cards |
 | `CHARS_PER_FLASHCARD_COMPREHENSIVE` | `1200` | Target character density for comprehensive cards |
+| `ENABLE_DEDUPLICATION` | `False` | Turn on to drop redundant questions using embeddings |
+| `DEDUPLICATION_THRESHOLD` | `0.95` | Cosine similarity threshold to consider two cards duplicates |
 | `ANKI_DECK_NAME` | `Lecture Notes` | Name of the top-level Anki deck |
+
+> **Note on Deduplication (`ENABLE_DEDUPLICATION`)**
+> Deduplication uses embedding cosine similarity to detect and drop redundant questions generated across adjacent chunks. 
+> - **Trade-off:** While it cleans up your deck by merging synonymous questions (e.g., "Etiology of X" vs "Causes of X"), an aggressive threshold might accidentally drop a valid card that asks about a subtly different detail (e.g., "Primary receptor" vs "Co-receptor"). 
+> - It is **disabled by default** to guarantee no loss of information. If enabled, the `DEDUPLICATION_THRESHOLD` is set very high (`0.95`) to only catch virtually identical questions.
 
 ---
 

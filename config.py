@@ -75,11 +75,23 @@ EMBEDDING_BATCH_SIZE = 50
 # -----------------------------------------------------------------------------
 
 # Generation style. Options: "atomic" (strict SRS, short answers) or "comprehensive" (broad paragraphs)
-FLASHCARD_STYLE = "atomic"
+FLASHCARD_STYLE = "comprehensive"
 
 # Target character density per flashcard. Used to calculate the dynamic quota per chunk.
 CHARS_PER_FLASHCARD_ATOMIC = 600
 CHARS_PER_FLASHCARD_COMPREHENSIVE = 1200
+
+# -----------------------------------------------------------------------------
+# Semantic Deduplication
+# -----------------------------------------------------------------------------
+
+# Whether to run a post-generation deduplication step using embeddings.
+ENABLE_DEDUPLICATION = False
+
+# Cosine similarity threshold for deduplication (0.0 to 1.0).
+# A higher value (e.g. 0.95) makes deduplication stricter (only near-exact semantic matches are dropped).
+# A lower value (e.g. 0.85) will drop cards that sound vaguely similar but might cause false positives.
+DEDUPLICATION_THRESHOLD = 0.95
 
 # Model temperature: lower values produce more structured, deterministic output
 LLM_TEMPERATURE = 0.3
