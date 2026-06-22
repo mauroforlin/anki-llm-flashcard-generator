@@ -34,28 +34,25 @@ class RateLimiter:
 
     async def acquire(self):
         """Block until a new request can be sent without exceeding the rate limit."""
-        async with self._lock:
-            now = time.monotonic()
-            window_start = now - 60.0
+        while True:
+            async with self._lock:
+                now = time.monotonic()
+                window_start = now - 60.0
 
-            # Drop timestamps that have fallen outside the 60-second window
-            while self._timestamps and self._timestamps[0] < window_start:
-                self._timestamps.popleft()
+                # Drop timestamps that have fallen outside the 60-second window
+                while self._timestamps and self._timestamps[0] < window_start:
+                    self._timestamps.popleft()
 
-            if len(self._timestamps) >= self.max_per_minute:
+                if len(self._timestamps) < self.max_per_minute:
+                    self._timestamps.append(now)
+                    return
+
                 # Calculate how long to wait until the oldest request expires
                 oldest = self._timestamps[0]
                 wait_time = 60.0 - (now - oldest) + 0.1
-                if wait_time > 0:
-                    logger.debug(f"Rate limit: waiting {wait_time:.1f}s")
-                    await asyncio.sleep(wait_time)
-                    # Recompute after the sleep
-                    now = time.monotonic()
-                    window_start = now - 60.0
-                    while self._timestamps and self._timestamps[0] < window_start:
-                        self._timestamps.popleft()
 
-            self._timestamps.append(time.monotonic())
+            logger.debug(f"Rate limit: waiting {wait_time:.1f}s")
+            await asyncio.sleep(wait_time)
 
 
 # Global rate limiter instance

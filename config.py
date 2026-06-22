@@ -67,7 +67,7 @@ MAX_CHUNK_SENTENCES = 30
 # Maximum approximate chunk size in characters
 MAX_CHUNK_CHARS = 3000
 
-# Batch size for embedding requests (OpenRouter accepts up to 100 inputs per call)
+# Batch size for embedding requests (OpenRouter accepts up to 96 inputs per call)
 EMBEDDING_BATCH_SIZE = 50
 
 # -----------------------------------------------------------------------------

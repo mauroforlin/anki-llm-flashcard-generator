@@ -8,7 +8,6 @@
 import asyncio
 import io
 import logging
-import os
 import sys
 import time
 from pathlib import Path
@@ -77,8 +76,8 @@ def validate_config():
 
     if not config.OPENROUTER_API_KEY or config.OPENROUTER_API_KEY == "YOUR-OPENROUTER-API-KEY":
         errors.append(
-            "[X] OPENROUTER_API_KEY is not set.\n"
-            "    Open config.py and insert your OpenRouter API key."
+            "[X] OPENROUTER_API_KEY is not set in your .env file.\n"
+            "    Copy .env.example to .env and insert your OpenRouter API key."
         )
 
     source_dir = Path(config.SOURCE_DIRECTORY)

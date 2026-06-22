@@ -11,6 +11,7 @@ from typing import Dict, List
 
 import genanki
 import html
+import markdown
 
 import config
 
@@ -138,12 +139,13 @@ def export_to_apkg(
             question = html.escape(question)
             answer = html.escape(answer)
 
-            # Convert newlines to HTML line breaks for Anki rendering
-            answer_html = answer.replace("\n- ", "\n* ").replace("\n", "<br>")
+            # Convert markdown to HTML for Anki rendering (handles bold, lists, etc.)
+            question_html = markdown.markdown(question)
+            answer_html = markdown.markdown(answer)
 
             note = genanki.Note(
                 model=model,
-                fields=[question, answer_html, pdf_name],
+                fields=[question_html, answer_html, pdf_name],
                 guid=genanki.guid_for(deck_name, question),  # stable GUID for safe re-import
             )
             deck.add_note(note)

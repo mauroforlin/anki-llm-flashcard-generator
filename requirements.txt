@@ -24,5 +24,5 @@ genanki>=0.13.0
 # Progress bar
 tqdm>=4.66.0
 
-# OpenAI-compatible client (pointed at OpenRouter)
-openai>=1.30.0
+# Markdown to HTML conversion for Anki cards
+markdown>=3.5.0

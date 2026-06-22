@@ -14,7 +14,7 @@ It was built as a personal study tool and is intentionally kept simple. There is
 
 | Feature | Details |
 |---|---|
-| **LLM backend** | Any model available on OpenRouter (default: `deepseek/deepseek-r1-0528`) |
+| **LLM backend** | Any model available on OpenRouter (default: `deepseek/deepseek-v4-flash`) |
 | **Semantic chunking** | Splits PDFs into topic-coherent sections using embedding cosine similarity |
 | **Parallel generation** | Up to 20 concurrent LLM requests with a built-in sliding-window rate limiter |
 | **Anki output** | A single `.apkg` file with one sub-deck per PDF source |
@@ -158,8 +158,8 @@ All settings live in `config.py`. The most useful ones are:
 | `MAX_REQUESTS_PER_MINUTE` | `185` | Rate limit (adjust for your OpenRouter plan) |
 | `MAX_CONCURRENT_LLM_REQUESTS` | `20` | Parallel LLM workers |
 | `SIMILARITY_THRESHOLD_PERCENTILE` | `85` | Chunking sensitivity (range 60-95; higher = smaller chunks) |
-| `FLASHCARDS_MIN_PER_CHUNK` | `5` | Minimum flashcards generated per chunk |
-| `FLASHCARDS_MAX_PER_CHUNK` | `12` | Maximum flashcards generated per chunk |
+| `FLASHCARDS_MIN_PER_CHUNK` | `2` | Minimum flashcards generated per chunk |
+| `FLASHCARDS_MAX_PER_CHUNK` | `5` | Maximum flashcards generated per chunk |
 | `ANKI_DECK_NAME` | `Lecture Notes` | Name of the top-level Anki deck |
 
 ---
